@@ -1,5 +1,5 @@
 package PersistenceManager;
 
-public class LogEntry {
+public class LogEntry extends WriteReq {
 
 }
