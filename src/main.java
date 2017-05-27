@@ -1,5 +1,6 @@
 import PersistenceManager.Client;
 import PersistenceManager.Manager;
+import PersistenceManager.FileSystem;
 
 public class main {
 
@@ -49,6 +50,9 @@ public class main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		clientsInit();
+		
+		//FileSystem fs = new FileSystem();
+		//fs.writeToFs(11, 7465, "Yo!"); //example usage
 	}
 
 }
