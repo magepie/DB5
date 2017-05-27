@@ -27,10 +27,10 @@ public class main {
 		//Thread t5= c5;
 
 		t1.start();
-		String t_id= persistentManager.beginTransaction();
+/*		String t_id= persistentManager.beginTransaction();
 		c1.setTaid(t_id);
 		System.out.println("Transaction initiated with transaction id "+c1.getTaid());
-		persistentManager.write(c1.getTaid(),01,"Test");
+		persistentManager.write(c1.getTaid(),01,"Test");*/
 		//t2.start();
 		//t3.start();
 		//t4.start();
@@ -51,8 +51,6 @@ public class main {
 		// TODO Auto-generated method stub
 		clientsInit();
 		
-		//FileSystem fs = new FileSystem();
-		//fs.writeToFs(11, 7465, "Yo!"); //example usage
 	}
 
 }

@@ -2,11 +2,23 @@ package PersistenceManager;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class Manager {
+	
+	private static final int WRITE = 0;
+	private static final int COMMIT = 1;
+	
     String fs_dir="fs/";
-    static final private Manager singleton; static {
+    String logLocation = new File("").getAbsolutePath() + "/ps/";
+    File LOG = new File("");
+    
+    ArrayList <WriteReq> writeBuffer = new ArrayList<WriteReq>();
+    
+    static final private Manager singleton; 
+    
+    static {
         try {
             singleton = new Manager();
         }
@@ -21,8 +33,8 @@ public class Manager {
         return TAID;
     }
 
-    public void write(String taid, int pageid, String data){
-        File page=new File(fs_dir+pageid+".txt");
+    public void write(WriteReq entry){
+/*        File page=new File(fs_dir+pageid+".txt");
         
         if(page.exists()){
             try {
@@ -33,7 +45,19 @@ public class Manager {
                 e.printStackTrace();
             }
         }
-        else System.out.println("Page with id "+pageid+" does not exist..");
+        else System.out.println("Page with id "+pageid+" does not exist..");*/
+    	
+    	long ts = System.currentTimeMillis();
+    	entry.setTs(ts);
+    	
+    	writeBuffer.add(entry);
+    	
+    	LogEntry log = new LogEntry();
+    	log.setEntry(entry);
+    	log.setOpType(WRITE);
+    	
+    	FileSystem fs = FileSystem.getInstance();
+    	fs.writeToLog(log);
     }
 
     public void commit(String taid){}
