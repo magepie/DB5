@@ -1,6 +1,9 @@
 import PersistenceManager.Client;
+import PersistenceManager.LogEntry;
 import PersistenceManager.Manager;
 import PersistenceManager.FileSystem;
+
+import java.util.logging.Logger;
 
 public class main {
 
@@ -13,6 +16,7 @@ public class main {
 		//int [] c5_pages= {80,99};
 
 		Manager persistentManager= Manager.getInstance();
+		LogEntry lg= new LogEntry();
 
 		//instantiating the clients
 		Client c1  = new Client("Client1",c1_pages);
@@ -30,7 +34,9 @@ public class main {
 		String t_id= persistentManager.beginTransaction();
 		c1.setTaid(t_id);
 		System.out.println("Transaction initiated with transaction id "+c1.getTaid());
+		//System.out.println("Client "+c1.getName()+" is writing page "+01);
 		persistentManager.write(c1.getTaid(),01,"Test");
+		lg.doLogging();
 		//t2.start();
 		//t3.start();
 		//t4.start();
