@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class FileSystem {
 	
@@ -73,7 +75,7 @@ public class FileSystem {
 		
 		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc, true)))) {
 			if (logData.getOpType() == 0) { // write entry
-				out.println(logData.getEntry().getTs() + " " + logData.getEntry().getPageId() + " " + logData.getOpType() + " " + logData.getEntry().getTid() + " " + logData.getEntry().getEntryData());
+				out.println(logData.getEntry().getTs() + " " + logData.getOpType() + " " + logData.getEntry().getTid() + " " + logData.getEntry().getPageId()+ " " + logData.getEntry().getEntryData());
 			}
 			else{ // commit entry
 				out.println(logData.getEntry().getTs() + " " + logData.getOpType() + " " + logData.getEntry().getTid());
