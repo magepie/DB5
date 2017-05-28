@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
 public class Manager {
 	
@@ -49,13 +50,27 @@ public class Manager {
     	
     	long ts = System.currentTimeMillis();
     	entry.setTs(ts);
-    	
-    	writeBuffer.add(entry);
-    	
+    	int pageid= entry.getPageId();
+        int arr_index=0;
+        boolean exists= false;
+
+        if(writeBuffer.size()!=0){
+            for(WriteReq w: writeBuffer)
+                if(w.getPageId()==pageid){ //checking if page already exists in the buffer
+                    arr_index=writeBuffer.indexOf(w);
+                    exists=true;
+                }
+        } else writeBuffer.add(entry);
+
+        if(exists){
+            writeBuffer.set(arr_index,entry); //overwriting duplicate
+        }
+        else writeBuffer.add(entry);
+
     	LogEntry log = new LogEntry();
     	log.setEntry(entry);
     	log.setOpType(WRITE);
-    	
+
     	FileSystem fs = FileSystem.getInstance();
     	fs.writeToLog(log);
     }
@@ -65,4 +80,6 @@ public class Manager {
     static public Manager getInstance() {
         return singleton;
     }
+
+
 }
