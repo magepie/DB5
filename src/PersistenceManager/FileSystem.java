@@ -61,9 +61,12 @@ public class FileSystem {
 	public void writeToPage(WriteReq wrRequest)
 	{
 		String loc =  new File("").getAbsolutePath() + "/fs/PAGE" + wrRequest.getPageId() + ".txt";
-		
-		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc, true)))) {
-		    out.println(wrRequest.getTs() + " " + wrRequest.getEntryData());
+		File page = new File(loc);
+		try {
+			FileWriter writer = new FileWriter(page, false);
+		    writer.write(wrRequest.getTs() + " " + wrRequest.getEntryData());
+		    writer.close();
+		    //out.println(wrRequest.getTs() + " " + wrRequest.getEntryData());
 		}catch (IOException e) {
 		    System.err.println(e);
 		}
