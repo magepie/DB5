@@ -13,10 +13,11 @@ public class Client extends Thread{
 	
 	public void run(){
 		//Manager persistentManager= Manager.getInstance();
-		WriteReq entry = new WriteReq();
+		WriteReq entry;
 		Manager persistentManager = Manager.getInstance();
 		System.out.println("Client with name "+name+" has been initiated!");
 		while(true){
+			entry= new WriteReq(); //it has to be initiated inside the while, else the entire buffer is overwritten
 			String t_id= persistentManager.beginTransaction();
 			entry.setTid(t_id);
 			System.out.println("Transaction initiated with transaction id " + entry.getTid());
