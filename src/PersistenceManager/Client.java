@@ -1,50 +1,62 @@
 package PersistenceManager;
+
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Client extends Thread{
-	private String name;
-	private int taid;
-	private int[] pageRange=new int[2];
 
-	public Client(String name, int pageRange[]){
-		this.name=name;
-		this.pageRange=pageRange;
-	}
-	
-	public void run(){
-		//Manager persistentManager= Manager.getInstance();
-		WriteReq entry;
-		Manager persistentManager = Manager.getInstance();
-		System.out.println("Client with name "+name+" has been initiated!");
-		while(true){
-			entry= new WriteReq(); //it has to be initiated inside the while, else the entire buffer is overwritten
-			String t_id= persistentManager.beginTransaction();
-			entry.setTid(t_id);
-			System.out.println("Transaction initiated with transaction id " + entry.getTid());
-			entry.setEntryData("Test data");
-			entry.setPageId(ThreadLocalRandom.current().nextInt(this.pageRange[0], this.pageRange[1] + 1));
-			persistentManager.write(entry);
-			try{
-				Thread.sleep(2000);
-			}catch(InterruptedException e){
-				return;
-			}
-		}
-	}
+public class Client extends Thread {
+    private String name;
+    private int taid;
+    private int[] pageRange = new int[2];
 
-	public void setTaid(int taid){
-		this.taid = taid;
-	}
 
-	public int getTaid(){
-		return taid;
-	}
+    public Client(String name, int pageRange[]) {
+        this.name = name;
+        this.pageRange = pageRange;
+    }
 
-	public void setPageRange(int[] pageRange){
-		this.pageRange=pageRange;
-	}
+    public void run() {
+        //Manager persistentManager= Manager.getInstance();
 
-	public int[] getPageRange(){
-		return pageRange;
-	}
+        Manager persistentManager = Manager.getInstance();
+        System.out.println("Client with name " + name + " has been initiated!");
+        while (true) {
+
+            WriteReq entry; //it has to be initiated inside the while, else the entire buffer is overwritten
+            String t_id = persistentManager.beginTransaction();
+
+            System.out.println(name + " Transaction initiated with transaction id " + t_id);
+
+            //write 4 times
+
+            for (int i = 0; i < 3; i++) {
+                entry = new WriteReq();
+                entry.setTid(t_id);
+                entry.setEntryData(name);
+                entry.setPageId(ThreadLocalRandom.current().nextInt(this.pageRange[0], this.pageRange[1] + 1));
+                persistentManager.write(entry);
+            }
+            //and commit
+            System.out.println(name + " Committing transaction " + t_id);
+
+            persistentManager.commit(t_id);
+        }
+    }
+
+    public void setTaid(int taid) {
+        this.taid = taid;
+    }
+
+    public int getTaid() {
+        return taid;
+    }
+
+    public void setPageRange(int[] pageRange) {
+        this.pageRange = pageRange;
+    }
+
+    public int[] getPageRange() {
+        return pageRange;
+    }
+
 }

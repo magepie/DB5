@@ -56,12 +56,18 @@ public class FileSystem {
 		}
 	}
 	
-	public void writeToPage(WriteReq wrRequest)
+	public void writeToPage(String[] pageContent)
 	{
-		String loc =  new File("").getAbsolutePath() + "/fs/PAGE" + wrRequest.getPageId() + ".txt";
+		System.out.println("Committing transaction by writing contents into pages");
+
+		String t_id=pageContent[1];
+		String pageid=pageContent[2];
+		String data= pageContent[3];
+
+		String loc =  new File("").getAbsolutePath() + "/fs/PAGE" + pageid + ".txt";
 		
-		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc, true)))) {
-		    out.println(wrRequest.getTs() + " " + wrRequest.getEntryData());
+		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc)))) {
+		    out.println(t_id + ",\t "+",\t "+pageid+",\t "+ data);
 		}catch (IOException e) {
 		    System.err.println(e);
 		}
@@ -76,7 +82,7 @@ public class FileSystem {
 				out.println(logData.getEntry().getTs() + " " + logData.getEntry().getPageId() + " " + logData.getOpType() + " " + logData.getEntry().getTid() + " " + logData.getEntry().getEntryData());
 			}
 			else{ // commit entry
-				out.println(logData.getEntry().getTs() + " " + logData.getOpType() + " " + logData.getEntry().getTid());
+				out.println(logData.getTaid() + " " + logData.getOpType());
 			}
 		}catch (IOException e) {
 		    System.err.println(e);
