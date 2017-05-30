@@ -22,6 +22,8 @@ public class RecoveryTool {
 		winnerTid.clear(); //clear the winner list
 		winnerList.clear();
 		
+		FileSystem fs = FileSystem.getInstance();
+		
 		try (BufferedReader br = new BufferedReader(new FileReader(loc))) {
 		    String line;
 		    while ((line = br.readLine()) != null) {
@@ -47,7 +49,7 @@ public class RecoveryTool {
 		    while ((line = br.readLine()) != null) {
 		    	String[] items = line.split(" ");
 		    	for (String winnerTaid : winnerTid){
-		    		if (winnerTaid.equals(items[2]) && (Integer.parseInt(items[1]) == WRITE)){
+		    		if ((Integer.parseInt(items[1]) == WRITE) && winnerTaid.equals(items[2])){
 		    			// winner TA detected
 		    			WriteReq entry = new WriteReq();
 		    			entry.setTs(Long.parseLong(items[0]));

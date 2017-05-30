@@ -1,5 +1,6 @@
 import PersistenceManager.Client;
 import PersistenceManager.Manager;
+import PersistenceManager.RecoveryTool;
 import PersistenceManager.WriteReq;
 import PersistenceManager.FileSystem;
 
@@ -45,8 +46,11 @@ public class main {
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		//clientsInit();
+		// perform recovery first
+		RecoveryTool recTool = new RecoveryTool();
+		recTool.redo();
+		
+		clientsInit();
 		
 	}
 

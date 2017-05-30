@@ -7,7 +7,7 @@ public class Manager {
 	private static final int WRITE = 0;
 	private static final int COMMIT = 1;
 
-    ArrayList <WriteReq> writeBuffer = new ArrayList<WriteReq>();
+    ArrayList <WriteReq> writeBuffer;
     List<LogEntry> adm;
 
     static final private Manager singleton; 
@@ -22,6 +22,7 @@ public class Manager {
 
     private Manager() {
         this.adm=new ArrayList<>();
+        this.writeBuffer = new ArrayList<WriteReq>();
     }
 
     public String beginTransaction(){
@@ -43,15 +44,17 @@ public class Manager {
         if(writeBuffer.size()!=0){ // checking if the buffer is not empty to check for duplicate entries
             for(Iterator<WriteReq> w = writeBuffer.iterator(); w.hasNext(); ) {
                 WriteReq value = w.next();
-                if ((value.getPageId()==pageid) && (value.getEntryData().equals(entry.getEntryData()))) {   //checking if page already exists in the buffer
-                    thingsToBeRemoved.add(value);                  //removing old entry
-                    thingsToBeAdded.add(entry);       //adding new entry
-                    LogEntry lg = new LogEntry();
-                    lg.setOpType(WRITE);
-                    lg.setEntry(entry);
-                    adm.add(lg);
-                    //break;
-                    exists=true;
+                if (value != null){
+                	if ((value.getPageId()==pageid) && (value.equals(entry))) {   //checking if page already exists in the buffer
+	                    thingsToBeRemoved.add(value);                  //removing old entry
+	                    thingsToBeAdded.add(entry);       //adding new entry
+	                    LogEntry lg = new LogEntry();
+	                    lg.setOpType(WRITE);
+	                    lg.setEntry(entry);
+	                    adm.add(lg);
+	                    //break;
+	                    exists=true;
+                	 }
                 }
             }
 
@@ -72,9 +75,12 @@ public class Manager {
             adm.add(lg);
         }
 
-        if (thingsToBeAdded.size()>0 && thingsToBeRemoved.size()>0){
-            writeBuffer.removeAll(thingsToBeRemoved);
+        if (thingsToBeAdded.size()>0){
             writeBuffer.addAll(thingsToBeAdded);
+        }
+        
+        if (thingsToBeRemoved.size()>0){
+            writeBuffer.removeAll(thingsToBeRemoved);
         }
 
     	LogEntry log = new LogEntry();
@@ -90,10 +96,11 @@ public class Manager {
     }
 
     public void commit(String tid){
-        
+        long ts = System.currentTimeMillis();
         LogEntry log = new LogEntry();
         WriteReq req = new WriteReq();
         req.setTid(tid);
+        req.setTs(ts);
         log.setEntry(req);
         log.setOpType(COMMIT);
         
@@ -145,10 +152,14 @@ public class Manager {
 
     private List<Integer> admCommits(List<LogEntry> adm){
         List<Integer> idx =  new ArrayList<Integer>();
-        for (LogEntry s:adm) {
-            if (s.getOpType() == COMMIT){ //find all commits and store their indexes
-                idx.add(adm.indexOf(s));
-            }
+        for (Iterator<LogEntry> s = adm.iterator(); s.hasNext();) {
+        	LogEntry value = s.next();
+        	if (value != null){
+        		if (value.getOpType() == COMMIT){ //find all commits and store their indexes
+                idx.add(adm.indexOf(value));
+        		}
+        	}
+            
         }
         return idx;
     }

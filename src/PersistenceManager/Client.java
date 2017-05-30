@@ -40,6 +40,12 @@ public class Client extends Thread {
             System.out.println(name + " Committing transaction " + t_id);
 
             persistentManager.commit(t_id);
+            try {
+				Thread.sleep((long)(Math.random() * 1000));
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 
