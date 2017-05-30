@@ -56,18 +56,14 @@ public class FileSystem {
 		}
 	}
 	
-	public void writeToPage(String[] pageContent)
+    public void writeToPage(WriteReq wrRequest)
 	{
-		System.out.println("Committing transaction by writing contents into pages");
-
-		String t_id=pageContent[1];
-		String pageid=pageContent[2];
-		String data= pageContent[3];
-
-		String loc =  new File("").getAbsolutePath() + "/fs/PAGE" + pageid + ".txt";
-		
-		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc)))) {
-		    out.println(t_id + ",\t "+",\t "+pageid+",\t "+ data);
+    	String loc =  new File("").getAbsolutePath() + "/fs/PAGE" + wrRequest.getPageId() + ".txt";
+    	File page = new File(loc);
+    	try {
+    		FileWriter writer = new FileWriter(page, false);
+    		writer.write(wrRequest.getTs() + " " + wrRequest.getEntryData());
+    		writer.close();
 		}catch (IOException e) {
 		    System.err.println(e);
 		}
@@ -79,10 +75,13 @@ public class FileSystem {
 		
 		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc, true)))) {
 			if (logData.getOpType() == 0) { // write entry
-				out.println(logData.getEntry().getTs() + " " + logData.getEntry().getPageId() + " " + logData.getOpType() + " " + logData.getEntry().getTid() + " " + logData.getEntry().getEntryData());
+				out.println(logData.getEntry().getTs() + " " + logData.getOpType() + " " + logData.getEntry().getTid() + " " + logData.getEntry().getPageId()+ " " + logData.getEntry().getEntryData());
 			}
-			else{ // commit entry
-				out.println(logData.getTaid() + " " + logData.getOpType());
+			else if (logData.getOpType() == 1){ // commit entry
+				out.println(logData.getEntry().getTs() + " " + logData.getOpType() + " " + logData.getEntry().getTid());
+			}
+			else if (logData.getOpType() == 2){ // redo entry
+				out.println(logData.getEntry().getTs() + " " + logData.getOpType());
 			}
 		}catch (IOException e) {
 		    System.err.println(e);
