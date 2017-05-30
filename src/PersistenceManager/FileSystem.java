@@ -73,7 +73,7 @@ public class FileSystem {
 	{
 		String loc =  new File("").getAbsolutePath() + "/ps/log.txt";
 		
-		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc, true)))) {
+		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(loc)))) {
 			if (logData.getOpType() == 0) { // write entry
 				out.println(logData.getEntry().getTs() + " " + logData.getOpType() + " " + logData.getEntry().getTid() + " " + logData.getEntry().getPageId()+ " " + logData.getEntry().getEntryData());
 			}

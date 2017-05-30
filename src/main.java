@@ -29,14 +29,23 @@ public class main {
 		Thread t5= c5;
 
 		t1.start();
-		t2.start();
-		t3.start();
-		t4.start();
-		t5.start();
 
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) { }
+		t2.start();
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) { }
+		t3.start();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) { }
+		t4.start();
+		try {
+			Thread.sleep(7000);
+		} catch (InterruptedException e) { }
+		t5.start();
 
 		t1.interrupt();
 		t2.interrupt();

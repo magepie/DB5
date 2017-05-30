@@ -35,17 +35,15 @@ public class Client extends Thread {
                 entry.setEntryData(name);
                 entry.setPageId(ThreadLocalRandom.current().nextInt(this.pageRange[0], this.pageRange[1] + 1));
                 persistentManager.write(entry);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) { }
             }
             //and commit
             System.out.println(name + " Committing transaction " + t_id);
 
             persistentManager.commit(t_id);
-            try {
-				Thread.sleep((long)(Math.random() * 1000));
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
         }
     }
 
