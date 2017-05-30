@@ -151,9 +151,10 @@ public class Manager {
 
     private List<Integer> admCommits(List<LogEntry> adm){
         List<Integer> idx =  new ArrayList<Integer>();
-        for (LogEntry s:adm) {
-            if (s.getOpType()==COMMIT){ //find all commits and store their indexes
-                idx.add(adm.indexOf(s));
+        for (Iterator<LogEntry> s = adm.iterator(); s.hasNext();) {
+            LogEntry value = s.next();
+            if (value.getOpType()==COMMIT){ //find all commits and store their indexes
+                idx.add(adm.indexOf(value));
             }
         }
         return idx;
