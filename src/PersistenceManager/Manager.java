@@ -39,7 +39,7 @@ public class Manager {
         boolean exists= false;
         boolean entryIn=false;
 
-        //System.out.println("Inserting write for page "+pageid+" into the Buffer.");
+        System.out.println("Inserting write for page "+pageid+" into the Buffer.");
         if(writeBuffer.size()!=0){ // checking if the buffer is not empty to check for duplicate entries
             for(Iterator<WriteReq> w = writeBuffer.iterator(); w.hasNext(); ) {
                 WriteReq value = w.next();
@@ -72,10 +72,11 @@ public class Manager {
             adm.add(write_info);
         }
 
-        if (thingsToBeAdded.size()>0 && thingsToBeRemoved.size()>0){
-            writeBuffer.removeAll(thingsToBeRemoved);
+        if (thingsToBeAdded.size()>0)
             writeBuffer.addAll(thingsToBeAdded);
-        }
+
+        if(thingsToBeRemoved.size()>0)
+            writeBuffer.removeAll(thingsToBeRemoved);
 
     	LogEntry log = new LogEntry();
     	log.setEntry(entry);
