@@ -7,8 +7,8 @@ public class Manager {
 	private static final int WRITE = 0;
 	private static final int COMMIT = 1;
 
-    ArrayList <WriteReq> writeBuffer = new ArrayList<WriteReq>();
-    List<String[]> adm;
+    ArrayList <WriteReq> writeBuffer = new ArrayList<>();
+    List<LogEntry> adm;
 
     static final private Manager singleton; 
     
@@ -30,8 +30,8 @@ public class Manager {
     }
 
     public void write(WriteReq entry){
-        List<WriteReq> thingsToBeAdded = new ArrayList<WriteReq>();
-        List<WriteReq> thingsToBeRemoved = new ArrayList<WriteReq>();
+        List<WriteReq> thingsToBeAdded = new ArrayList<>();
+        List<WriteReq> thingsToBeRemoved = new ArrayList<>();
 
         long ts = System.currentTimeMillis();
     	entry.setTs(ts);
@@ -46,7 +46,9 @@ public class Manager {
                 if ((value.getPageId()==pageid) && (value.getEntryData().equals(entry.getEntryData()))) {   //checking if page already exists in the buffer
                     thingsToBeRemoved.add(value);                  //removing old entry
                     thingsToBeAdded.add(entry);       //adding new entry
-                    String[] write_info = {"WRITE", entry.getTid(), String.valueOf(entry.getPageId()), entry.getEntryData()};
+                    LogEntry write_info = new LogEntry();
+                    write_info.setOpType(WRITE);
+                    write_info.setEntry(entry);
                     adm.add(write_info);
                     //break;
                     exists=true;
@@ -55,14 +57,18 @@ public class Manager {
 
         } else {    //if empty write its first entry
             writeBuffer.add(entry);
-            String[] write_info = {"WRITE", entry.getTid(), String.valueOf(entry.getPageId()), entry.getEntryData()};
+            LogEntry write_info = new LogEntry();
+            write_info.setOpType(WRITE);
+            write_info.setEntry(entry);
             adm.add(write_info);
             entryIn=true;
         }
         //Not duplicate entry
         if(!exists && !entryIn){
             thingsToBeAdded.add(entry);
-            String[] write_info = {"WRITE", entry.getTid(), String.valueOf(entry.getPageId()), entry.getEntryData()};
+            LogEntry write_info = new LogEntry();
+            write_info.setOpType(WRITE);
+            write_info.setEntry(entry);
             adm.add(write_info);
         }
 
@@ -83,17 +89,18 @@ public class Manager {
         }
     }
 
-    public void commit(String tid){
-        String[] commit_info = {"COMMIT", tid};
+    public void commit(WriteReq entry){
+        LogEntry commit_info = new LogEntry();
+        commit_info.setOpType(COMMIT);
+        commit_info.setEntry(entry);
         adm.add(commit_info);
 
         LogEntry log = new LogEntry();
-        log.setTaid(tid);
+        log.setEntry(entry);
         log.setOpType(COMMIT);
 
         FileSystem fs = FileSystem.getInstance();
         fs.writeToLog(log);
-
 
     }
 
@@ -104,7 +111,7 @@ public class Manager {
 
     public void houseKeeping() {
 
-        List<String[]> thingsToBeRemoved = new ArrayList<>();
+        List<LogEntry> thingsToBeRemoved = new ArrayList<>();
 
         if (adm.size() > 5) {
             FileSystem fs = FileSystem.getInstance();
@@ -116,15 +123,19 @@ public class Manager {
             if(commit_idx.size()>0) {
                 for (int i = 0; i < commit_idx.size(); i++) {
                     int idx = commit_idx.get(i); //commit index in adm list
-                    String[] commit = adm.get(idx); //get the full commit object to extract the tid
-                    String tid = commit[1];
+                    LogEntry commit = adm.get(idx); //get the full commit object to extract the tid
+                    String tid = commit.getEntry().getTid();
 
                     thingsToBeRemoved.add(adm.get(idx));
 
-                    for(Iterator<String[]> s = adm.iterator(); s.hasNext(); ) {
-                        String[] value = s.next();
-                        if (value[0].equals("WRITE") && value[1].equals(tid)) {
-                            fs.writeToPage(value);
+                    for(Iterator<LogEntry> s = adm.iterator(); s.hasNext(); ) {
+                        LogEntry value = s.next();
+                        if (value.getOpType()==WRITE && value.getEntry().getTid().equals(tid)) {
+                            WriteReq r= new WriteReq();
+                            r.setEntryData(value.getEntry().getEntryData());
+                            r.setTid(value.getEntry().getTid());
+                            r.setPageId(value.getEntry().getPageId());
+                            fs.writeToPage(r);
                             thingsToBeRemoved.add(value);
                         }
                     }
@@ -137,10 +148,10 @@ public class Manager {
             adm.removeAll(thingsToBeRemoved);
     }
 
-    private List<Integer> admCommits(List<String[]> adm){
+    private List<Integer> admCommits(List<LogEntry> adm){
         List<Integer> idx =  new ArrayList<Integer>();
-        for (String[] s:adm) {
-            if (s[0].equals("COMMIT")){ //find all commits and store their indexes
+        for (LogEntry s:adm) {
+            if (s.getOpType()==COMMIT){ //find all commits and store their indexes
                 idx.add(adm.indexOf(s));
             }
         }

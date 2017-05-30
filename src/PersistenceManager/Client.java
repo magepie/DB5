@@ -28,6 +28,7 @@ public class Client extends Thread {
             System.out.println(name + " Transaction initiated with transaction id " + t_id);
 
             //write 4 times
+            WriteReq r= new WriteReq();
 
             for (int i = 0; i < 3; i++) {
                 entry = new WriteReq();
@@ -35,11 +36,12 @@ public class Client extends Thread {
                 entry.setEntryData(name);
                 entry.setPageId(ThreadLocalRandom.current().nextInt(this.pageRange[0], this.pageRange[1] + 1));
                 persistentManager.write(entry);
+                r.setTid(entry.getTid());
             }
             //and commit
             System.out.println(name + " Committing transaction " + t_id);
 
-            persistentManager.commit(t_id);
+            persistentManager.commit(r);
         }
     }
 
